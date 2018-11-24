@@ -127,8 +127,10 @@ namespace TCP_Client
             return data;
         }
 
-        public static string SetData(string OP, int A1, int A2, string ST, int ID, string TS)
+        //data ustawiana automatycznie
+        public static string SetData(string OP, int A1, int A2, string ST, int ID)
         {
+
             StringBuilder data = new StringBuilder();
             data.AppendFormat("OP={0}$" +
                               "A1={1}$" +
@@ -141,7 +143,7 @@ namespace TCP_Client
                               A2,
                               ST,
                               ID,
-                              TS
+                              DateTime.Now.ToString()
                              );
             return data.ToString();
         }
