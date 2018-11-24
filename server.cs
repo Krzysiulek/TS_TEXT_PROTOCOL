@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -10,8 +10,10 @@ namespace server_tcp
 
         private readonly Int32 port;//port
         private readonly string IP;//IP 
+        private NetworkStream stream;
         private TcpClient client;//klient od ktorego odbieramy
         private TcpListener listener;//serwer
+
 
 
         public Server(string IP_, Int32 port_)
@@ -31,12 +33,11 @@ namespace server_tcp
             Console.WriteLine("Connection request accepted!");
         }
 
-
         public void Listen()
         {
             try
             {
-                NetworkStream stream = client.GetStream(); //stream czyli 
+                stream = client.GetStream(); //łącze z klientem, od ktorego odbieramy dane i do ktorego pozniej bedziemy wysylali dane 
                 byte[] receivedData = new byte[4096];
 
                 if (stream.DataAvailable)
@@ -55,5 +56,14 @@ namespace server_tcp
 
         }
 
+        public void Send()
+        {
+            Console.WriteLine("Write your message: ");
+            stream = client.GetStream(); //łącze z klientem, od ktorego odbieramy dane i do ktorego pozniej bedziemy wysylali dane 
+            byte[] outStream = Encoding.ASCII.GetBytes(Console.ReadLine());
+            stream.Write(outStream, 0, outStream.Length);
+            Console.WriteLine("Size: {0}", outStream.Length);
+            stream.Flush();
+        }
     }
 }
