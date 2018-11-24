@@ -1,26 +1,22 @@
-﻿using System;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-
+using System;
+using System.Threading;
 
 namespace server_tcp
 {
     class MainClass
     {
-        private static Int32 port = 8080;
-        private static string IP = "127.0.0.1";
+        private static readonly Int32 port = 8080;
+        private static readonly string IP = "127.0.0.1";
 
         public static void Main(string[] args)
         {
-
             Server server = new Server(IP, port);
 
-            while (true)
+            while(true)
             {
                 server.Listen();
+                server.Send();
             }
-
         }
     }
 }
