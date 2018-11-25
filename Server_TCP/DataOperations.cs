@@ -1,27 +1,30 @@
 ﻿using System;
 using System.Text;
 using System.Text.RegularExpressions;
-/*
-* Przykładowe dane do wysłania
-* OP=dodaj$A1=123$A2=45$ST=ZLE$ID=11$TS=21.02.1992_09:45
-* 
-* OP - pole operacji
-* A1/A2 - pole argumentu1/2
-* ST - pole statusu
-* ID - pole identyfikatora
-* TS - pole znacznika czasu - Timestamp
-* 
-* 
-* BRAK KONTROLI CZY INT PRZY GetA1/A2, tj. jak będzie String zamiast inta, to się wywala wyjątek
-*/
-
-namespace TCP_Client
+namespace server_tcp
 {
+
+    /*
+    * Przykładowe dane do wysłania
+    * OP=dodaj$A1=123$A2=45$ST=ZLE$ID=11$TS=21.02.1992_09:45
+    * 
+    * OP - pole operacji
+    * A1/A2 - pole argumentu1/2
+    * ST - pole statusu
+    * ID - pole identyfikatora
+    * TS - pole znacznika czasu - Timestamp
+    * 
+    * 
+    * BRAK KONTROLI CZY INT PRZY GetA1/A2, tj. jak będzie String zamiast inta, to się wywala wyjątek
+    */
+
+
     public class DataOperations
     {
-        public DataOperations(){}
+        public DataOperations() { }
 
-        public static string GetOP(string data){
+        public string GetOP(string data)
+        {
             Match match = Regex.Match(data, @"OP=(\w*)\$"); //pattern do pola operacji
 
             if (match.Success) //jesli pattern pasuje
@@ -38,7 +41,8 @@ namespace TCP_Client
             return data;
         }
 
-        public static int GetA1(string data){
+        public int GetA1(string data)
+        {
             Match match = Regex.Match(data, @"A1=(\w*)\$"); //pattern do pola operacji
 
             if (match.Success) //jesli pattern pasuje
@@ -50,12 +54,12 @@ namespace TCP_Client
 
             data = Regex.Replace(data, @"A1=", ""); //wyrzuca OP=
             data = Regex.Replace(data, @"\$", ""); //wyrzuca znak $
-            //Console.WriteLine(data); //wypisuje tak na wszelki wypadek
+                                                   //Console.WriteLine(data); //wypisuje tak na wszelki wypadek
 
             return Convert.ToInt32(data);
         }
 
-        public static int GetA2(string data)
+        public int GetA2(string data)
         {
             Match match = Regex.Match(data, @"A2=(\w*)\$"); //pattern do pola operacji
 
@@ -73,7 +77,7 @@ namespace TCP_Client
             return Convert.ToInt32(data);
         }
 
-        public static string GetST(string data)
+        public string GetST(string data)
         {
             Match match = Regex.Match(data, @"ST=(\w*)\$"); //pattern do pola operacji
 
@@ -91,7 +95,7 @@ namespace TCP_Client
             return data;
         }
 
-        public static int GetID(string data)
+        public int GetID(string data)
         {
             Match match = Regex.Match(data, @"ID=(\w*)\$"); //pattern do pola operacji
 
@@ -109,7 +113,7 @@ namespace TCP_Client
             return Convert.ToInt32(data);
         }
 
-        public static string GetTS(string data)
+        public string GetTS(string data)
         {
             Match match = Regex.Match(data, @"TS=(.*)\$"); //pattern do pola operacji
 
@@ -128,7 +132,7 @@ namespace TCP_Client
         }
 
         //data ustawiana automatycznie
-        public static string SetData(string OP, int A1, int A2, string ST, int ID)
+        public string SetData(string OP, int A1, int A2, string ST, int ID)
         {
 
             StringBuilder data = new StringBuilder();
@@ -148,4 +152,5 @@ namespace TCP_Client
             return data.ToString();
         }
     }
+
 }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading;
 
 namespace server_tcp
@@ -14,8 +14,7 @@ namespace server_tcp
 
             while(true)
             {
-                server.Listen();
-                server.Send();
+                    server.Listen();
             }
         }
     }

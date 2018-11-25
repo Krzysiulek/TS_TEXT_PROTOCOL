@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -13,57 +13,120 @@ namespace server_tcp
         private NetworkStream stream;
         private TcpClient client;//klient od ktorego odbieramy
         private TcpListener listener;//serwer
+        ClientData clientData = new ClientData();
 
-
+        DataOperations dataOperations = new DataOperations(); //operacje, dzieki ktorym tworzymy ciag znakow
+        Operations op = new Operations(); //konkretne operacje dodaj, poteguj itd
 
         public Server(string IP_, Int32 port_)
         {
-            this.IP = IP_;
-            this.port = port_;
-            this.listener = new TcpListener(IPAddress.Parse(IP), port);
-            this.client = default(TcpClient);
-
-            Start();
-        }
-        private void Start()
-        {
+            IP = IP_;
+            port = port_;
+            listener = new TcpListener(IPAddress.Parse(IP), port);
+            Console.WriteLine("Listening...");
             listener.Start();//poczatek słuchania
             Console.WriteLine("Server is working!");
-            this.client = listener.AcceptTcpClient(); //akceptowanie połączonego klientaTCP
+            Start();
+        }
+
+        private void Start()
+        {
+            client = listener.AcceptTcpClient(); //akceptowanie połączonego klientaTCP
             Console.WriteLine("Connection request accepted!");
+            stream = client.GetStream(); //łącze z klientem, od ktorego odbieramy dane i do ktorego pozniej bedziemy wysylali dane 
         }
 
         public void Listen()
         {
-            try
+            while (true)
             {
-                stream = client.GetStream(); //łącze z klientem, od ktorego odbieramy dane i do ktorego pozniej bedziemy wysylali dane 
-                byte[] receivedData = new byte[4096];
-
-                if (stream.DataAvailable)
+                try
                 {
-                    stream.Read(receivedData, 0, receivedData.Length);
-                    String text = Encoding.ASCII.GetString(receivedData); //odebrany tekst od klienta
-                    text = text.Substring(0, text.IndexOf('\0'));
-                    Console.WriteLine("Text from client: {0}", text);
-                    stream.Flush();
+                    byte[] receivedData = new byte[4096];
+
+                    if (stream.DataAvailable)
+                    {
+                        stream.Read(receivedData, 0, receivedData.Length);
+                        string text = Encoding.ASCII.GetString(receivedData); //odebrany tekst od klienta
+                        text = text.Substring(0, text.IndexOf('\0'));
+                        Console.WriteLine("Text from client: {0}", text);
+                        OperateRequest(text);
+                        break;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.ToString());
                 }
             }
-            catch(Exception e)
+        }
+
+        private void Send(string text) //wysyłania odpowiedzi do klienta
+        {
+            byte[] outStream = Encoding.ASCII.GetBytes(text);
+            stream.Write(outStream, 0, outStream.Length);
+            Console.WriteLine("Size: {0}", outStream.Length);
+            stream.Flush();
+        }
+
+        private void OperateRequest(string text)
+        {
+            if (!clientData.getID())
             {
-                Console.WriteLine(e.ToString());
+                Console.WriteLine("Sending ID... ");
+                int id = ID();
+                text = dataOperations.SetData(op.SetId, 0, 0, "dob", id);
+                clientData.setID(id);
+                Send(text);
+            }
+            else
+            {
+                string operation = dataOperations.GetOP(text);
+                Console.WriteLine("Operation {0}",operation);;
+
+                switch (operation)
+                {
+                    case "Dodaj":
+                        int a1, a2;
+                        a1 = dataOperations.GetA1(text);
+                        a2 = dataOperations.GetA2(text);
+
+                        break;
+                    case "Poteguj":
+                        break;
+                    case "Logarytmuj":
+                        break;
+                    case "Silnia":
+                        break;
+                    case "HistoryID":
+                        break;
+                    case "HistoryOP":
+                        break;
+                    default:
+                        Console.WriteLine("Incorrect command");
+                        Send("Incorrect command");
+                        break;
+                }
             }
 
         }
 
-        public void Send()
+
+        private void Stop()
         {
-            Console.WriteLine("Write your message: ");
-            stream = client.GetStream(); //łącze z klientem, od ktorego odbieramy dane i do ktorego pozniej bedziemy wysylali dane 
-            byte[] outStream = Encoding.ASCII.GetBytes(Console.ReadLine());
-            stream.Write(outStream, 0, outStream.Length);
-            Console.WriteLine("Size: {0}", outStream.Length);
-            stream.Flush();
+            listener.Stop();
+        }
+
+        private void Close()
+        {
+            client.Close();
+        }
+
+        private int ID()
+        {
+            Random rand = new Random();
+            return rand.Next(255);
+
         }
     }
 }
