@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading;
 
 namespace client_tcp
@@ -14,8 +14,8 @@ namespace client_tcp
 
             while(true)
             {
-                client.Send();
-                client.Receive();
+                    client.Send();
+                    client.Receive();
             }
         }
     }
