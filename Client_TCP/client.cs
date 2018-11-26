@@ -26,7 +26,6 @@ namespace client_tcp
             Console.WriteLine("Write your message: ");
             serverStream = client.GetStream();
             string text = Console.ReadLine();
-            text = DataOperations.SetData(op.add, 2, 3, "sob", 244);
             byte[] outStream = Encoding.ASCII.GetBytes(text);
 
             serverStream.Write(outStream, 0, outStream.Length);
