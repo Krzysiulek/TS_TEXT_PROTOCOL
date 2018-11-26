@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace client_tcp
@@ -15,11 +15,21 @@ namespace client_tcp
             hist.Add(op);
         }
 
-        public void print()
+        public void printID(int id)
         {
             foreach(String s in hist)
             {
-                Console.WriteLine(s);
+                if(DataOperations.GetID(s) == id)
+                    Console.WriteLine(s);
+            }
+        }
+
+        public void printOP(string OP)
+        {
+            foreach (String s in hist)
+            {
+                if (DataOperations.GetOP(s) == OP)
+                    Console.WriteLine(s);
             }
         }
     }
