@@ -16,7 +16,7 @@ namespace server_tcp
         ClientData clientData = new ClientData();
 
         DataOperations dataOperations = new DataOperations(); //operacje, dzieki ktorym tworzymy ciag znakow
-        Operations op = new Operations(); //konkretne operacje dodaj, poteguj itd
+        OperStatus op = new OperStatus(); //konkretne operacje dodaj, poteguj itd
 
         public Server(string IP_, Int32 port_)
         {
@@ -75,22 +75,25 @@ namespace server_tcp
             {
                 Console.WriteLine("Sending ID... ");
                 int id = ID();
-                text = dataOperations.SetData(op.SetId, 0, 0, "dob", id);
+                text = dataOperations.SetData(op.SetId , 0, 0, "cor", id, id.ToString());
                 clientData.setID(id);
                 Send(text);
             }
             else
             {
                 string operation = dataOperations.GetOP(text);
+                int a1, a2;
+                a1 = dataOperations.GetA1(text);
+                a2 = dataOperations.GetA2(text);
+                string to_send, buff;
                 Console.WriteLine("Operation {0}",operation);;
 
                 switch (operation)
                 {
-                    case "Dodaj":
-                        int a1, a2;
-                        a1 = dataOperations.GetA1(text);
-                        a2 = dataOperations.GetA2(text);
-
+                    case "Dodaj":                       
+                        buff = Operations.add(a1, a2);
+                        to_send = dataOperations.SetData(op.add, 0, 0, "cor", clientData.getIDint(), buff);
+                        Send(to_send);
                         break;
                     case "Poteguj":
                         break;

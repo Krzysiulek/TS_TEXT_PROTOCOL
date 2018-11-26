@@ -6,6 +6,7 @@ namespace server_tcp
         public String operation;
         public history()
         {
+
         }
     }
 }
