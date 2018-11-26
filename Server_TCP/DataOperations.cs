@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Text.RegularExpressions;
-namespace client_tcp
+namespace server_tcp
 {
    
     /*
