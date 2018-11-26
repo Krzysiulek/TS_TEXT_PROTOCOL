@@ -13,7 +13,7 @@ namespace client_tcp
     * ST - pole statusu
     * ID - pole identyfikatora
     * TS - pole znacznika czasu - Timestamp
-    * 
+    * DT - pole odpowiedzi
     * 
     * BRAK KONTROLI CZY INT PRZY GetA1/A2, tj. jak będzie String zamiast inta, to się wywala wyjątek
     */
@@ -29,15 +29,15 @@ namespace client_tcp
 
                 if (match.Success) //jesli pattern pasuje
                 {
-                    Console.WriteLine(match.Value);
+                    //Console.WriteLine(match.Value);
                     data = match.Value;
                 }
                 else return null; //jesli nie pasuje zwracamy nic
 
                 data = Regex.Replace(data, @"OP=", ""); //wyrzuca OP=
                 data = Regex.Replace(data, @"\$", ""); //wyrzuca znak $
-                Console.WriteLine(data); //wypisuje tak na wszelki wypadek
-
+                //Console.WriteLine(data); //wypisuje tak na wszelki wypadek
+                Console.WriteLine("Regex result: " + data);
                 return data;
             }
 
@@ -55,8 +55,8 @@ namespace client_tcp
                 data = Regex.Replace(data, @"A1=", ""); //wyrzuca OP=
                 data = Regex.Replace(data, @"\$", ""); //wyrzuca znak $
                                                        //Console.WriteLine(data); //wypisuje tak na wszelki wypadek
-
-                return Convert.ToInt32(data);
+            Console.WriteLine("Regex result: " + data);
+            return Convert.ToInt32(data);
             }
 
             public static int GetA2(string data)
@@ -65,16 +65,17 @@ namespace client_tcp
 
                 if (match.Success) //jesli pattern pasuje
                 {
-                    Console.WriteLine(match.Value);
+                    //Console.WriteLine(match.Value);
                     data = match.Value;
                 }
                 else return 0; //jesli nie pasuje zwracamy nic
 
                 data = Regex.Replace(data, @"A2=", ""); //wyrzuca OP=
                 data = Regex.Replace(data, @"\$", ""); //wyrzuca znak $
-                Console.WriteLine(data); //wypisuje tak na wszelki wypadek
+                //Console.WriteLine(data); //wypisuje tak na wszelki wypadek
 
-                return Convert.ToInt32(data);
+            Console.WriteLine("Regex result: " + data);
+            return Convert.ToInt32(data);
             }
 
             public static string GetST(string data)
@@ -83,16 +84,16 @@ namespace client_tcp
 
                 if (match.Success) //jesli pattern pasuje
                 {
-                    Console.WriteLine(match.Value);
+                    //Console.WriteLine(match.Value);
                     data = match.Value;
                 }
                 else return null; //jesli nie pasuje zwracamy nic
 
                 data = Regex.Replace(data, @"ST=", ""); //wyrzuca OP=
                 data = Regex.Replace(data, @"\$", ""); //wyrzuca znak $
-                Console.WriteLine(data); //wypisuje tak na wszelki wypadek
-
-                return data;
+                                                       //Console.WriteLine(data); //wypisuje tak na wszelki wypadek
+            Console.WriteLine("Regex result: " + data);
+            return data;
             }
 
             public static int GetID(string data)
@@ -101,16 +102,17 @@ namespace client_tcp
 
                 if (match.Success) //jesli pattern pasuje
                 {
-                    Console.WriteLine(match.Value);
+                    //Console.WriteLine(match.Value);
                     data = match.Value;
                 }
                 else return 0; //jesli nie pasuje zwracamy nic
 
                 data = Regex.Replace(data, @"ID=", ""); //wyrzuca OP=
                 data = Regex.Replace(data, @"\$", ""); //wyrzuca znak $
-                Console.WriteLine(data); //wypisuje tak na wszelki wypadek
+                //Console.WriteLine(data); //wypisuje tak na wszelki wypadek
 
-                return Convert.ToInt32(data);
+            Console.WriteLine("Regex result: " + data);
+            return Convert.ToInt32(data);
             }
 
             public static string GetTS(string data)
@@ -119,20 +121,40 @@ namespace client_tcp
 
                 if (match.Success) //jesli pattern pasuje
                 {
-                    Console.WriteLine(match.Value);
+                    //Console.WriteLine(match.Value);
                     data = match.Value;
                 }
                 else return null; //jesli nie pasuje zwracamy nic
 
                 data = Regex.Replace(data, @"TS=", ""); //wyrzuca OP=
                 data = Regex.Replace(data, @"\$", ""); //wyrzuca znak $
-                Console.WriteLine(data); //wypisuje tak na wszelki wypadek
+                //Console.WriteLine(data); //wypisuje tak na wszelki wypadek
 
-                return data;
+            Console.WriteLine("Regex result: " + data);
+            return data;
             }
 
-            //data ustawiana automatycznie
-            public static string SetData(string OP, int A1, int A2, string ST, int ID)
+        public static string GetDT(string data)
+        {
+            Match match = Regex.Match(data, @"DT=(.*)\$"); //pattern do pola operacji
+
+            if (match.Success) //jesli pattern pasuje
+            {
+                //Console.WriteLine(match.Value);
+                data = match.Value;
+            }
+            else return null; //jesli nie pasuje zwracamy nic
+
+            data = Regex.Replace(data, @"DT=", ""); //wyrzuca DT=
+            data = Regex.Replace(data, @"\$", ""); //wyrzuca znak $
+            //Console.WriteLine(data); //wypisuje tak na wszelki wypadek
+
+            Console.WriteLine("Regex result: " + data);
+            return data;
+        }
+
+        //data ustawiana automatycznie
+        public static string SetData(string OP, int A1, int A2, string ST, int ID, string DT)
             {
 
                 StringBuilder data = new StringBuilder();
@@ -141,12 +163,14 @@ namespace client_tcp
                                   "A2={2}$" +
                                   "ST={3}$" +
                                   "ID={4}$" +
-                                  "TS={5}$",
+                                  "DT={5}$" +
+                                  "TS={6}$",
                                   OP,
                                   A1,
                                   A2,
                                   ST,
                                   ID,
+                                  DT,
                                   DateTime.Now.ToString()
                                  );
                 return data.ToString();
