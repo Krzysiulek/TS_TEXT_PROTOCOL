@@ -136,11 +136,11 @@ namespace server_tcp
 
         public static string GetDT(string data)
         {
-            Match match = Regex.Match(data, @"DT=(.*)\$"); //pattern do pola operacji
+            Match match = Regex.Match(data, @"DT=(\w*)\$"); //pattern do pola operacji
 
             if (match.Success) //jesli pattern pasuje
             {
-                //Console.WriteLine(match.Value);
+                Console.WriteLine(match.Value);
                 data = match.Value;
             }
             else return null; //jesli nie pasuje zwracamy nic
