@@ -3,13 +3,13 @@ namespace client_tcp
 {
     public class Operations
     {
-        public String add = "Dodaj";
-        public String pow = "Poteguj";
-        public String log = "Logarytmuj";
-        public String fac = "Silnia";
-        public String SetId = "SetId";
-        public String GetHistoryID = "HistoryID";
-        public String GetHistoryOP = "HisotryOP";
+        public String add = "dodaj";
+        public String pow = "poteguj";
+        public String log = "logarytmuj";
+        public String fac = "silnia";
+        public String SetId = "setId";
+        public String GetHistoryID = "historyID";
+        public String GetHistoryOP = "historyOP";
 
         public Operations(){}
     }
