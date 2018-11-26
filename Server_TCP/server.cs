@@ -13,9 +13,8 @@ namespace server_tcp
         private NetworkStream stream;
         private TcpClient client;//klient od ktorego odbieramy
         private TcpListener listener;//serwer
+        private history History = new history();
         ClientData clientData = new ClientData();
-
-        DataOperations dataOperations = new DataOperations(); //operacje, dzieki ktorym tworzymy ciag znakow
         OperStatus op = new OperStatus(); //konkretne operacje dodaj, poteguj itd
 
         public Server(string IP_, Int32 port_)
@@ -38,6 +37,8 @@ namespace server_tcp
 
         public void Listen()
         {
+            Console.WriteLine("What do you want to do?");
+            Console.WriteLine();
             while (true)
             {
                 try
@@ -75,35 +76,45 @@ namespace server_tcp
             {
                 Console.WriteLine("Sending ID... ");
                 int id = ID();
-                text = dataOperations.SetData(op.SetId , 0, 0, "cor", id, id.ToString());
+                text = DataOperations.SetData(op.SetId , 0, 0, "cor", id, id.ToString());
                 clientData.setID(id);
+                History.add(text);
                 Send(text);
             }
             else
             {
-                string operation = dataOperations.GetOP(text);
+                string operation = DataOperations.GetOP(text);
                 int a1, a2;
-                a1 = dataOperations.GetA1(text);
-                a2 = dataOperations.GetA2(text);
+                a1 = DataOperations.GetA1(text);
+                a2 = DataOperations.GetA2(text);
                 string to_send, buff;
                 Console.WriteLine("Operation {0}",operation);;
 
                 switch (operation)
                 {
-                    case "Dodaj":                       
-                        buff = Operations.add(a1, a2);
-                        to_send = dataOperations.SetData(op.add, 0, 0, "cor", clientData.getIDint(), buff);
+                    case "dodaj":                       
+                        buff = Operations.Add(a1, a2);
+                        to_send = DataOperations.SetData(op.add, 0, 0, "cor", clientData.getIDint(), buff);
+                        History.add(to_send);
                         Send(to_send);
                         break;
-                    case "Poteguj":
+                    case "poteguj":
+                        buff = Operations.Pow(a1, a2);
+                        to_send = DataOperations.SetData(op.pow, 0, 0, "cor", clientData.getIDint(), buff);
+                        History.add(to_send);
+                        Send(to_send);
                         break;
-                    case "Logarytmuj":
+                    case "logarytmuj":
+                        buff = Operations.Log(a1, a2);
+                        to_send = DataOperations.SetData(op.log, 0, 0, "cor", clientData.getIDint(), buff);
+                        History.add(to_send);
+                        Send(to_send);
                         break;
-                    case "Silnia":
-                        break;
-                    case "HistoryID":
-                        break;
-                    case "HistoryOP":
+                    case "silnia":
+                        buff = Operations.Fac(a1, a2);
+                        to_send = DataOperations.SetData(op.fac, 0, 0, "cor", clientData.getIDint(), buff);
+                        History.add(to_send);
+                        Send(to_send);
                         break;
                     default:
                         Console.WriteLine("Incorrect command");

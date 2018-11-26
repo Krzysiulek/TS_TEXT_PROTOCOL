@@ -16,29 +16,29 @@ namespace server_tcp
     {
         public Operations() { }
 
-        public static string pow(int a1, int a2)
+        public static string Pow(int a1, int a2)
         {
             double x = Math.Pow(a1, a2);
             return x.ToString();
         }
 
-        public static string log(int a1, int a2)
+        public static string Log(int a1, int a2)
         {
             double x = Math.Log(a1, a2);
             return x.ToString();
         }
 
-        public static string fac(int a1, int a2)
+        public static string Fac(int a1, int a2)
         {
-            return factor(a1 + a2).ToString();
+            return Factor(a1 + a2).ToString();
         }
 
-        public static string add(int a1, int a2)
+        public static string Add(int a1, int a2)
         {
             return (a1 + a2).ToString();
         }
 
-        private static double factor(int number)
+        private static double Factor(int number)
         {
             double result = 1;
             while (number != 1)
