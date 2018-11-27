@@ -12,8 +12,10 @@ namespace client_tcp
         private NetworkStream serverStream;
         public TcpClient client;
         Operations op = new Operations();
+        history history = new history();
         int ID;
 
+        //inicjalizacja
         public Client(string IP_, Int32 port_)
         {
             IP = IP_;
@@ -22,19 +24,25 @@ namespace client_tcp
             client.Connect(IPAddress.Parse(IP), port);
         }
 
+        //wysylanie
         public void Send()
         {
+            if(ID == 0){
+                serverStream = client.GetStream();
+                serverStream.Write(Encoding.ASCII.GetBytes(DataOperations.SetData("nadID",0,0,"cor",0,"")), 0, 2);
+                return;
+            }
             Console.WriteLine("Write your message: ");
             serverStream = client.GetStream();
             string text = Console.ReadLine();
-            text = ManageRequests(text); //Ta metoda zwraca poprawną Daną którą trxeba wysłać
+            text = ManageRequestsSend(text); //Ta metoda zwraca poprawną Daną którą trxeba wysłać
             byte[] outStream = Encoding.ASCII.GetBytes(text);
 
             serverStream.Write(outStream, 0, outStream.Length);
             Console.WriteLine("Size: {0}", outStream.Length);
         }
 
-        public string ManageRequests(string text){
+        public string ManageRequestsSend(string text){
             //dodawanie
             if(text == op.add){
                 Console.WriteLine("Dodawanie (a1 + a2)...");
@@ -68,6 +76,7 @@ namespace client_tcp
 
                 return DataOperations.SetData(op.log, A1, A2, "GR", ID, "");
             }
+            //potegowanie
             else if(text == op.pow){
                 Console.WriteLine("Potega A1 ^ A2!");
                 int A1, A2;
@@ -78,17 +87,60 @@ namespace client_tcp
 
                 return DataOperations.SetData(op.pow, A1, A2, "GR", ID, "");
             }
-            else{
-                Console.WriteLine("Niepoprawne dane. Mozliwe operacje to:\n{0}\n{1}\n{2}\n{3}",
+
+            //dorobić!!!!
+            else if(text == op.GetHistoryID){
+                Console.WriteLine("Your's ID is "+ ID + ".Your's operations:");
+                history.printID(ID);
+
+                Send();
+            }
+            else if (text == op.GetHistoryOP)
+            {
+                string OP;
+                Console.WriteLine("Your history by Operations:");
+                Console.WriteLine("What operation are you interested in?");
+                OP = Console.ReadLine();
+                history.printOP(OP);
+
+                Send();
+            }
+            else
+            {
+                Console.WriteLine("Niepoprawne dane. Mozliwe operacje to:\n\t{0}\n\t{1}\n\t{2}\n\t{3}\n\t{4}\n\t{5}",
                                   op.add,
                                   op.fac,
                                   op.log,
-                                  op.pow);
+                                  op.pow,
+                                  op.GetHistoryID,
+                                  op.GetHistoryOP);
                 Send();
             }
             return "";
         }
 
+        //do obslugi odebranych danych
+        public void ManageRequestsRecv(string text){
+            history.Add(text); //dodawanie do historii
+
+            if(DataOperations.GetST(text) == "cor"){
+                Console.WriteLine("Result: OP = {0}, A1 = {1}, A2 = {2} equals = {3}",
+                                  DataOperations.GetOP(text),
+                                  DataOperations.GetA1(text),
+                                  DataOperations.GetA2(text),
+                                  DataOperations.GetDT(text));
+            }
+            else
+            {
+                Console.WriteLine("Result: OP = {0}, A1 = {1}, A2 = {2} equals = {3}",
+                                  DataOperations.GetOP(text),
+                                  DataOperations.GetA1(text),
+                                  DataOperations.GetA2(text),
+                                  "Przekroczono zakres zmiennej");
+            }
+        }
+
+        //odbieranie
         public void Receive()
         {
             while (true)
@@ -104,7 +156,8 @@ namespace client_tcp
                         String text = Encoding.ASCII.GetString(receivedData); //odebrany tekst od klienta
                         ID = DataOperations.GetID(text); //odświeżam ID
                         //text = text.Substring(0, text.IndexOf('\0'));
-                        Console.WriteLine("Text from server: {0}", text);
+                        ManageRequestsRecv(text);
+                        //Console.WriteLine("Text from server: {0}", text);
                         break;
                     }
                 }

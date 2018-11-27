@@ -1,35 +1,53 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace client_tcp
 {
     public class history
     {
-        public String operation;
-        public List<String> hist;
+        public string operation;
+        public List<string> hist = new List<string>();
 
-        public history(){}
+        public history() { }
 
-        public void add(String op)
+        public void Add(string op)
         {
             hist.Add(op);
         }
 
         public void printID(int id)
         {
-            foreach(String s in hist)
+            foreach (string s in hist)
             {
-                if(DataOperations.GetID(s) == id)
-                    Console.WriteLine(s);
+                if (DataOperations.GetID(s) == id){
+                    Console.WriteLine("Operation: {0}, A1= {1}, A2= {2}, Equals = {3}\n",
+                                      DataOperations.GetOP(s),
+                                      DataOperations.GetA1(s),
+                                      DataOperations.GetA2(s),
+                                      DataOperations.GetDT(s)
+                                     );
+                }
+
             }
+        }
+
+        public void printCalculation(string calc){
+            //dorobić drukowanie dla jednego obliczenia
         }
 
         public void printOP(string OP)
         {
-            foreach (String s in hist)
+            foreach (string s in hist)
             {
                 if (DataOperations.GetOP(s) == OP)
-                    Console.WriteLine(s);
+                {
+                    Console.WriteLine("Operation: {0}, A1= {1}, A2= {2}, Equals = {3}\n",
+                                      DataOperations.GetOP(s),
+                                      DataOperations.GetA1(s),
+                                      DataOperations.GetA2(s),
+                                      DataOperations.GetDT(s)
+                                     );
+                }
             }
         }
     }
