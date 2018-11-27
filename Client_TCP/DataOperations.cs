@@ -37,7 +37,7 @@ namespace client_tcp
             data = Regex.Replace(data, @"OP=", ""); //wyrzuca OP=
             data = Regex.Replace(data, @"\$", ""); //wyrzuca znak $
                                                    //Console.WriteLine(data); //wypisuje tak na wszelki wypadek
-            Console.WriteLine("Regex result: " + data);
+            //Console.WriteLine("Regex result: " + data);
             return data;
         }
 
@@ -55,7 +55,7 @@ namespace client_tcp
             data = Regex.Replace(data, @"A1=", ""); //wyrzuca OP=
             data = Regex.Replace(data, @"\$", ""); //wyrzuca znak $
                                                    //Console.WriteLine(data); //wypisuje tak na wszelki wypadek
-            Console.WriteLine("Regex result: " + data);
+            //Console.WriteLine("Regex result: " + data);
             return Convert.ToInt32(data);
         }
 
@@ -74,7 +74,7 @@ namespace client_tcp
             data = Regex.Replace(data, @"\$", ""); //wyrzuca znak $
                                                    //Console.WriteLine(data); //wypisuje tak na wszelki wypadek
 
-            Console.WriteLine("Regex result: " + data);
+            //Console.WriteLine("Regex result: " + data);
             return Convert.ToInt32(data);
         }
 
@@ -92,7 +92,7 @@ namespace client_tcp
             data = Regex.Replace(data, @"ST=", ""); //wyrzuca OP=
             data = Regex.Replace(data, @"\$", ""); //wyrzuca znak $
                                                    //Console.WriteLine(data); //wypisuje tak na wszelki wypadek
-            Console.WriteLine("Regex result: " + data);
+            //Console.WriteLine("Regex result: " + data);
             return data;
         }
 
@@ -111,7 +111,7 @@ namespace client_tcp
             data = Regex.Replace(data, @"\$", ""); //wyrzuca znak $
                                                    //Console.WriteLine(data); //wypisuje tak na wszelki wypadek
 
-            Console.WriteLine("Regex result: " + data);
+            //Console.WriteLine("Regex result: " + data);
             return Convert.ToInt32(data);
         }
 
@@ -136,20 +136,21 @@ namespace client_tcp
 
         public static string GetDT(string data)
         {
-            Match match = Regex.Match(data, @"DT=(\w*)\$"); //pattern do pola operacji
+            Match match = Regex.Match(data, @"DT=\d+.*\d*\$TS"); //pattern do pola DANYCH
+            //match = match.NextMatch();
 
             if (match.Success) //jesli pattern pasuje
             {
-                Console.WriteLine(match.Value);
+                //Console.WriteLine(match.Value);
                 data = match.Value;
             }
             else return null; //jesli nie pasuje zwracamy nic
 
             data = Regex.Replace(data, @"DT=", ""); //wyrzuca DT=
-            data = Regex.Replace(data, @"\$", ""); //wyrzuca znak $
+            data = Regex.Replace(data, @"\$TS", ""); //wyrzuca znak $
             //Console.WriteLine(data); //wypisuje tak na wszelki wypadek
 
-            Console.WriteLine("Regex result: " + data);
+            //Console.WriteLine("Regex result: " + data);
             return data;
         }
 
