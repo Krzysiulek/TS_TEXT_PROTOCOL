@@ -6,7 +6,7 @@ namespace server_tcp
     public class history
     {
         public String operation;
-        public List<String> hist;
+        public List<String> hist = new List<String>();
 
         public history() { }
 

@@ -24,7 +24,7 @@ namespace server_tcp
 
         public static string Log(int a1, int a2)
         {
-            double x = Math.Log(a1, a2);
+            double x = Math.Log(a2, a1);
             return x.ToString();
         }
 

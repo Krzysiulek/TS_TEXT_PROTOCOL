@@ -41,6 +41,7 @@ namespace server_tcp
             Console.WriteLine();
             while (true)
             {
+
                 try
                 {
                     byte[] receivedData = new byte[4096];
@@ -61,7 +62,7 @@ namespace server_tcp
                 }
             }
         }
-
+        
         private void Send(string text) //wysyłania odpowiedzi do klienta
         {
             byte[] outStream = Encoding.ASCII.GetBytes(text);
@@ -94,25 +95,25 @@ namespace server_tcp
                 {
                     case "dodaj":                       
                         buff = Operations.Add(a1, a2);
-                        to_send = DataOperations.SetData(op.add, 0, 0, "cor", clientData.getIDint(), buff);
+                        to_send = DataOperations.SetData(op.add, a1, a2, "cor", clientData.getIDint(), buff);
                         History.add(to_send);
                         Send(to_send);
                         break;
                     case "poteguj":
                         buff = Operations.Pow(a1, a2);
-                        to_send = DataOperations.SetData(op.pow, 0, 0, "cor", clientData.getIDint(), buff);
+                        to_send = DataOperations.SetData(op.pow, a1, a2, "cor", clientData.getIDint(), buff);
                         History.add(to_send);
                         Send(to_send);
                         break;
                     case "logarytmuj":
                         buff = Operations.Log(a1, a2);
-                        to_send = DataOperations.SetData(op.log, 0, 0, "cor", clientData.getIDint(), buff);
+                        to_send = DataOperations.SetData(op.log, a1, a2, "cor", clientData.getIDint(), buff);
                         History.add(to_send);
                         Send(to_send);
                         break;
                     case "silnia":
                         buff = Operations.Fac(a1, a2);
-                        to_send = DataOperations.SetData(op.fac, 0, 0, "cor", clientData.getIDint(), buff);
+                        to_send = DataOperations.SetData(op.fac, a1, a2, "cor", clientData.getIDint(), buff);
                         History.add(to_send);
                         Send(to_send);
                         break;
@@ -125,6 +126,31 @@ namespace server_tcp
 
         }
 
+
+        public void PrintHistory()
+        {
+            string i, oper;
+            while(true)
+            {
+                i = Console.ReadLine();
+                switch(i)
+                {
+                    case "1":
+                        Console.WriteLine("History by ID..");
+                        History.printID(clientData.getIDint());
+                        break;
+                    case "2":
+                        Console.WriteLine("History by operation..");
+                        Console.WriteLine("which operation do you want?");
+                        oper = Console.ReadLine();
+                        History.printOP(oper);
+                        break;
+                    default:
+                        Console.WriteLine("No such operation..");
+                        break;
+                }
+            }
+        }
 
         private void Stop()
         {

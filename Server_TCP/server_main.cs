@@ -11,6 +11,8 @@ namespace server_tcp
         public static void Main(string[] args)
         {
             Server server = new Server(IP, port);
+            Thread t1 = new Thread(server.PrintHistory);
+            t1.Start();
 
             while(true)
             {
