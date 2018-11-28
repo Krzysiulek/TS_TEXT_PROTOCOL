@@ -8,6 +8,7 @@ class OperStatus
     public String SetId = "setId";
     public String GetHistoryID = "historyID";
     public String GetHistoryOP = "historyOP";
+    public String Disconnect = "disconnect";
 }
 
 namespace server_tcp
@@ -19,6 +20,7 @@ namespace server_tcp
         public static string Pow(int a1, int a2)
         {
             double x = Math.Pow(a1, a2);
+            Console.WriteLine("x : " + x);
             return x.ToString();
         }
 

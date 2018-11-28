@@ -62,7 +62,7 @@ namespace server_tcp
                 }
             }
         }
-        
+
         private void Send(string text) //wysyłania odpowiedzi do klienta
         {
             byte[] outStream = Encoding.ASCII.GetBytes(text);
@@ -77,7 +77,7 @@ namespace server_tcp
             {
                 Console.WriteLine("Sending ID... ");
                 int id = ID();
-                text = DataOperations.SetData(op.SetId , 0, 0, "cor", id, id.ToString());
+                text = DataOperations.SetData(op.SetId, 0, 0, "cor", id, id.ToString());
                 clientData.setID(id);
                 History.add(text);
                 Send(text);
@@ -89,33 +89,68 @@ namespace server_tcp
                 a1 = DataOperations.GetA1(text);
                 a2 = DataOperations.GetA2(text);
                 string to_send, buff;
-                Console.WriteLine("Operation {0}",operation);;
+                Console.WriteLine("Operation {0}", operation); ;
 
                 switch (operation)
                 {
-                    case "dodaj":                       
+                    case "dodaj":
                         buff = Operations.Add(a1, a2);
-                        to_send = DataOperations.SetData(op.add, a1, a2, "cor", clientData.getIDint(), buff);
+                        if (buff == "Infinity")
+                        {
+                            Console.WriteLine("To big number!");
+                            to_send = DataOperations.SetData(op.add, a1, a2, "inc", clientData.getIDint(), buff); //incorrect
+                        }
+                        else
+                        {
+                            to_send = DataOperations.SetData(op.add, a1, a2, "cor", clientData.getIDint(), buff);//correct
+                        }
                         History.add(to_send);
                         Send(to_send);
                         break;
                     case "poteguj":
                         buff = Operations.Pow(a1, a2);
-                        to_send = DataOperations.SetData(op.pow, a1, a2, "cor", clientData.getIDint(), buff);
+                        if (buff == "Infinity")
+                        {
+                            Console.WriteLine("To big number!");
+                            to_send = DataOperations.SetData(op.pow, a1, a2, "inc", clientData.getIDint(), buff);
+                        }
+                        else
+                        {
+                            to_send = DataOperations.SetData(op.pow, a1, a2, "cor", clientData.getIDint(), buff);
+                        }
                         History.add(to_send);
                         Send(to_send);
                         break;
                     case "logarytmuj":
                         buff = Operations.Log(a1, a2);
-                        to_send = DataOperations.SetData(op.log, a1, a2, "cor", clientData.getIDint(), buff);
+                        if (buff == "Infinity")
+                        {
+                            Console.WriteLine("To big number!");
+                            to_send = DataOperations.SetData(op.log, a1, a2, "inc", clientData.getIDint(), buff);
+                        }
+                        else
+                        {
+                            to_send = DataOperations.SetData(op.log, a1, a2, "cor", clientData.getIDint(), buff);
+                        }
                         History.add(to_send);
                         Send(to_send);
                         break;
                     case "silnia":
                         buff = Operations.Fac(a1, a2);
-                        to_send = DataOperations.SetData(op.fac, a1, a2, "cor", clientData.getIDint(), buff);
+                        if (buff == "Infinity")
+                        {
+                            Console.WriteLine("To big number!");
+                            to_send = DataOperations.SetData(op.fac, a1, a2, "inc", clientData.getIDint(), buff);
+                        }
+                        else
+                        {
+                            to_send = DataOperations.SetData(op.fac, a1, a2, "cor", clientData.getIDint(), buff);
+                        }
                         History.add(to_send);
                         Send(to_send);
+                        break;
+                    case "disconnect":
+                        Close();
                         break;
                     default:
                         Console.WriteLine("Incorrect command");
@@ -130,10 +165,10 @@ namespace server_tcp
         public void PrintHistory()
         {
             string i, oper;
-            while(true)
+            while (true)
             {
                 i = Console.ReadLine();
-                switch(i)
+                switch (i)
                 {
                     case "1":
                         Console.WriteLine("History by ID..");
