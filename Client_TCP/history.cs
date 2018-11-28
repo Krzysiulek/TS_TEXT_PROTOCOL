@@ -20,19 +20,19 @@ namespace client_tcp
             foreach (string s in hist)
             {
                 if (DataOperations.GetID(s) == id){
-                    Console.WriteLine("Operation: {0}, A1= {1}, A2= {2}, Equals = {3}\n",
-                                      DataOperations.GetOP(s),
-                                      DataOperations.GetA1(s),
-                                      DataOperations.GetA2(s),
-                                      DataOperations.GetDT(s)
-                                     );
+                    printCalculation(s);
                 }
 
             }
         }
 
         public void printCalculation(string calc){
-            //dorobić drukowanie dla jednego obliczenia
+            Console.WriteLine("Operation: {0}, A1= {1}, A2= {2}, Equals = {3}\n",
+                                      DataOperations.GetOP(s),
+                                      DataOperations.GetA1(s),
+                                      DataOperations.GetA2(s),
+                                      DataOperations.GetDT(s)
+                                     );
         }
 
         public void printOP(string OP)
@@ -41,12 +41,7 @@ namespace client_tcp
             {
                 if (DataOperations.GetOP(s) == OP)
                 {
-                    Console.WriteLine("Operation: {0}, A1= {1}, A2= {2}, Equals = {3}\n",
-                                      DataOperations.GetOP(s),
-                                      DataOperations.GetA1(s),
-                                      DataOperations.GetA2(s),
-                                      DataOperations.GetDT(s)
-                                     );
+                    printCalculation(s);
                 }
             }
         }
