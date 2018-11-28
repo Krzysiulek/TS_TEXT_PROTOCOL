@@ -40,6 +40,12 @@ namespace client_tcp
 
             serverStream.Write(outStream, 0, outStream.Length);
             Console.WriteLine("Size: {0}", outStream.Length);
+
+            if (DataOperations.GetOP(text) == op.Disconnect)
+            {
+                Close();
+                Console.WriteLine("Disconnected");
+            }
         }
 
         public string ManageRequestsSend(string text){
