@@ -26,7 +26,7 @@ namespace client_tcp
             }
         }
 
-        public void printCalculation(string calc){
+        public void printCalculation(string s){
             Console.WriteLine("Operation: {0}, A1= {1}, A2= {2}, Equals = {3}\n",
                                       DataOperations.GetOP(s),
                                       DataOperations.GetA1(s),

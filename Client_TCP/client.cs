@@ -45,50 +45,50 @@ namespace client_tcp
         public string ManageRequestsSend(string text){
             //dodawanie
             if(text == op.add){
-                Console.WriteLine("Dodawanie (a1 + a2)...");
+                Console.WriteLine("Addition (a1 + a2)...");
                 int A1, A2;
-                Console.WriteLine("Podaj argument A1");
+                Console.WriteLine("Give argument A1");
                 A1 = Convert.ToInt32(Console.ReadLine());
-                Console.WriteLine("Podaj argument A2");
+                Console.WriteLine("Give argument A2");
                 A2 = Convert.ToInt32(Console.ReadLine());
 
                 return DataOperations.SetData(op.add, A1, A2, "GR", ID, "");
             }
             //silnia z sumy
             else if(text == op.fac){
-                Console.WriteLine("Silnia z sumy (a1 + a2)!");
+                Console.WriteLine("Sum factorial (a1 + a2)!");
                 int A1, A2;
-                Console.WriteLine("Podaj argument A1");
+                Console.WriteLine("Give argument A1");
                 A1 = Convert.ToInt32(Console.ReadLine());
-                Console.WriteLine("Podaj argument A2");
+                Console.WriteLine("Give argument A2");
                 A2 = Convert.ToInt32(Console.ReadLine());
 
                 return DataOperations.SetData(op.fac, A1, A2, "GR", ID, "");
             }
             //logarytm
             else if(text == op.log){
-                Console.WriteLine("Logarytm (log A1 (A2) )!");
+                Console.WriteLine("Logarithm (log A1 (A2) )!");
                 int A1, A2;
-                Console.WriteLine("Podaj argument A1");
+                Console.WriteLine("Give argument A1");
                 A1 = Convert.ToInt32(Console.ReadLine());
-                Console.WriteLine("Podaj argument A2");
+                Console.WriteLine("Give argument A2");
                 A2 = Convert.ToInt32(Console.ReadLine());
 
                 return DataOperations.SetData(op.log, A1, A2, "GR", ID, "");
             }
             //potegowanie
             else if(text == op.pow){
-                Console.WriteLine("Potega A1 ^ A2!");
+                Console.WriteLine("Power A1 ^ A2!");
                 int A1, A2;
-                Console.WriteLine("Podaj argument A1");
+                Console.WriteLine("Give argument A1");
                 A1 = Convert.ToInt32(Console.ReadLine());
-                Console.WriteLine("Podaj argument A2");
+                Console.WriteLine("Give argument A2");
                 A2 = Convert.ToInt32(Console.ReadLine());
 
                 return DataOperations.SetData(op.pow, A1, A2, "GR", ID, "");
             }
 
-            //dorobić!!!!
+            //drukowanie historii
             else if(text == op.GetHistoryID){
                 Console.WriteLine("Your's ID is "+ ID + ".Your's operations:");
                 history.printID(ID);
@@ -105,15 +105,22 @@ namespace client_tcp
 
                 Send();
             }
+
+            else if (text == op.Disconnect){
+                Console.WriteLine("Disconneting...");
+                return DataOperations.SetData(op.Disconnect, 0, 0, "", ID, "");
+            }
+
             else
             {
-                Console.WriteLine("Niepoprawne dane. Mozliwe operacje to:\n\t{0}\n\t{1}\n\t{2}\n\t{3}\n\t{4}\n\t{5}",
+                Console.WriteLine("Incorrect Data. Available operations:\n\t{0}\n\t{1}\n\t{2}\n\t{3}\n\t{4}\n\t{5}\n\t{6}",
                                   op.add,
                                   op.fac,
                                   op.log,
                                   op.pow,
                                   op.GetHistoryID,
-                                  op.GetHistoryOP);
+                                  op.GetHistoryOP,
+                                  op.Disconnect);
                 Send();
             }
             return "";

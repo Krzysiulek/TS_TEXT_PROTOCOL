@@ -10,6 +10,7 @@ namespace client_tcp
         public String SetId = "setId";
         public String GetHistoryID = "historyID";
         public String GetHistoryOP = "historyOP";
+        public String Disconnect = "disconnect";
 
         public Operations(){}
     }
