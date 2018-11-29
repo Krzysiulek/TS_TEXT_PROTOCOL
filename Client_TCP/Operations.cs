@@ -3,14 +3,16 @@ namespace client_tcp
 {
     public class Operations
     {
-        public String add = "dodaj";
-        public String pow = "poteguj";
-        public String log = "logarytmuj";
-        public String fac = "silnia";
-        public String SetId = "setId";
-        public String GetHistoryID = "historyID";
-        public String GetHistoryOP = "historyOP";
-        public String Disconnect = "disconnect";
+
+        public string reqID = "reqID";
+        public string setID = "setID";
+        public string pow = "potega";
+        public string log = "logarytm";
+        public string add = "dodawanie";
+        public string fac = "silnia";
+        public string hisID = "historiaID";
+        public string hisOP = "historiaOP";
+        public string discon = "disconnect";
 
         public Operations(){}
     }

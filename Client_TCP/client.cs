@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 
 namespace client_tcp
 {
@@ -13,7 +14,7 @@ namespace client_tcp
         public TcpClient client;
         Operations op = new Operations();
         history history = new history();
-        int ID;
+        int ID = 0;
 
         //inicjalizacja
         public Client(string IP_, Int32 port_)
@@ -27,129 +28,192 @@ namespace client_tcp
         //wysylanie
         public void Send()
         {
-            if(ID == 0){
-                serverStream = client.GetStream();
-                serverStream.Write(Encoding.ASCII.GetBytes(DataOperations.SetData("nadID",0,0,"cor",0,"")), 0, 2);
+            serverStream = client.GetStream();
+            byte[] buffer;
+            //jezeli klient nie ma nadanego ID
+            if (ID == 0)
+            {
+                string tmp = DataOperations.SetData("reqID", "cor", 0); //komunikat - rządanie o ID
+                buffer = Encoding.ASCII.GetBytes(tmp); //przekształcenie komunikatu w byte[] 
+                serverStream.Write(buffer, 0, buffer.Length); //wysłanie
                 return;
             }
-            Console.WriteLine("Write your message: ");
-            serverStream = client.GetStream();
-            string text = Console.ReadLine();
-            text = ManageRequestsSend(text); //Ta metoda zwraca poprawną Daną którą trxeba wysłać
-            byte[] outStream = Encoding.ASCII.GetBytes(text);
+            //////////////////////////////////
 
-            serverStream.Write(outStream, 0, outStream.Length);
-            Console.WriteLine("Size: {0}", outStream.Length);
+            string text = SendManage(); //tu się dzieją operacje
 
-            if (DataOperations.GetOP(text) == op.Disconnect)
+            //jezeli nie zwrocilo null'a, no to wysyła
+            if(text != null){
+                byte[] outStream = Encoding.ASCII.GetBytes(text);
+                serverStream.Write(outStream, 0, outStream.Length);
+            }
+
+            //tutaj zamykam
+            if (DataOperations.GetOP(text) == op.discon)
             {
                 Close();
-                Console.WriteLine("Disconnected");
+            }
+
+        }
+
+        int GetA1(){
+            int A1;
+            Console.WriteLine("Give me argument 1");
+            try{
+                A1 = Convert.ToInt32(Console.ReadLine());
+                return A1;
+            }
+            catch(Exception e){
+                Console.WriteLine("Something went wrong...");
+                Console.WriteLine(e);
+                return GetA1();
             }
         }
 
-        public string ManageRequestsSend(string text){
-            //dodawanie
-            if(text == op.add){
-                Console.WriteLine("Addition (a1 + a2)...");
-                int A1, A2;
-                Console.WriteLine("Give argument A1");
-                A1 = Convert.ToInt32(Console.ReadLine());
-                Console.WriteLine("Give argument A2");
+        int GetA2()
+        {
+            int A2;
+            Console.WriteLine("Give me argument 2");
+            try
+            {
                 A2 = Convert.ToInt32(Console.ReadLine());
-
-                return DataOperations.SetData(op.add, A1, A2, "GR", ID, "");
+                return A2;
             }
-            //silnia z sumy
-            else if(text == op.fac){
-                Console.WriteLine("Sum factorial (a1 + a2)!");
-                int A1, A2;
-                Console.WriteLine("Give argument A1");
-                A1 = Convert.ToInt32(Console.ReadLine());
-                Console.WriteLine("Give argument A2");
-                A2 = Convert.ToInt32(Console.ReadLine());
-
-                return DataOperations.SetData(op.fac, A1, A2, "GR", ID, "");
+            catch (Exception e)
+            {
+                Console.WriteLine("Something went wrong...");
+                Console.WriteLine(e);
+                return GetA2();
             }
-            //logarytm
+        }
+
+        //metoda do zwracania co ma być wysłane w zależności od wejściowego polecenia
+        private string SendManage(){
+            Console.WriteLine("What do you want to do: ");
+            string text = Console.ReadLine();
+            Console.WriteLine(text);
+            //sprawdzamy jaka operacje ma wykonac
+            if(text == op.pow){
+                Console.WriteLine(op.pow + " A1 ^ A2");
+                return DataOperations.SetData(op.pow, "cor", ID, GetA1(), GetA2());
+            }
             else if(text == op.log){
-                Console.WriteLine("Logarithm (log A1 (A2) )!");
-                int A1, A2;
-                Console.WriteLine("Give argument A1");
-                A1 = Convert.ToInt32(Console.ReadLine());
-                Console.WriteLine("Give argument A2");
-                A2 = Convert.ToInt32(Console.ReadLine());
-
-                return DataOperations.SetData(op.log, A1, A2, "GR", ID, "");
-            }
-            //potegowanie
-            else if(text == op.pow){
-                Console.WriteLine("Power A1 ^ A2!");
-                int A1, A2;
-                Console.WriteLine("Give argument A1");
-                A1 = Convert.ToInt32(Console.ReadLine());
-                Console.WriteLine("Give argument A2");
-                A2 = Convert.ToInt32(Console.ReadLine());
-
-                return DataOperations.SetData(op.pow, A1, A2, "GR", ID, "");
+                Console.WriteLine(op.log + " log A1 (A2)");
+                return DataOperations.SetData(op.log, "cor", ID, GetA1(), GetA2());
             }
 
-            //drukowanie historii
-            else if(text == op.GetHistoryID){
-                Console.WriteLine("Your's ID is "+ ID + ".Your's operations:");
-                history.printID(ID);
-
-                Send();
+            else if(text == op.add){
+                Console.WriteLine(op.add + " A1 + A2");
+                return DataOperations.SetData(op.add, "cor", ID, GetA1(), GetA2());
             }
-            else if (text == op.GetHistoryOP)
-            {
-                string OP;
-                Console.WriteLine("Your history by Operations:");
-                Console.WriteLine("What operation are you interested in?");
-                OP = Console.ReadLine();
-                history.printOP(OP);
-
-                Send();
+            else if(text == op.fac){
+                Console.WriteLine(op.fac + " A1!");
+                return DataOperations.SetData(op.fac, "cor", ID, GetA1());
             }
-
-            else if (text == op.Disconnect){
-                Console.WriteLine("Disconneting...");
-                return DataOperations.SetData(op.Disconnect, 0, 0, "", ID, "");
+            else if(text == op.hisID){
+                Console.WriteLine("All history request sent...");
+                return DataOperations.SetData(op.hisID, "cor", ID);
+            }
+            else if(text == op.hisOP){
+                Console.WriteLine("Which operation are you interested in?");
+                return DataOperations.SetData(op.hisID, "cor", ID, GetA1());
+            }
+            else if(text == op.discon){
+                Console.WriteLine("Disconnecting...");
+                return DataOperations.SetData(op.discon, "cor", ID);
             }
 
-            else
-            {
-                Console.WriteLine("Incorrect Data. Available operations:\n\t{0}\n\t{1}\n\t{2}\n\t{3}\n\t{4}\n\t{5}\n\t{6}",
+            else{
+                Console.WriteLine("Incorrect operation. Available operations:" +
+                                  "\n\t{0}" +
+                                  "\n\t{1}" +
+                                  "\n\t{2}" +
+                                  "\n\t{3}" +
+                                  "\n\t{4}" +
+                                  "\n\t{5}" +
+                                  "\n\t{6}",
                                   op.add,
                                   op.fac,
                                   op.log,
                                   op.pow,
-                                  op.GetHistoryID,
-                                  op.GetHistoryOP,
-                                  op.Disconnect);
-                Send();
+                                  op.hisID,
+                                  op.hisOP,
+                                  op.discon);
+                return null;
             }
-            return "";
         }
 
-        //do obslugi odebranych danych
-        public void ManageRequestsRecv(string text){
-            history.Add(text); //dodawanie do historii
-
+        private void ReceiveManage(string text){
+            //otrzymano poprawne dane
             if(DataOperations.GetST(text) == "cor"){
-                Console.WriteLine("Result: OP = {0}, A1 = {1}, A2 = {2} equals = {3}",
-                                  DataOperations.GetOP(text),
-                                  DataOperations.GetA1(text),
-                                  DataOperations.GetA2(text),
-                                  DataOperations.GetDT(text));
+                //pobieranie ID
+                if(DataOperations.GetOP(text) == op.setID){
+                    ID = DataOperations.GetID(text);
+                }
+                //dla POW
+                else if(DataOperations.GetOP(text) == op.pow)
+                {
+                    Console.WriteLine("#{0} {1}: {2}^{3} = {4}",
+                                      DataOperations.GetIO(text),
+                                      op.pow,
+                                      DataOperations.GetA1(text),
+                                      DataOperations.GetA2(text),
+                                      DataOperations.GetDT(text));
+                }
+
+                //dla LOG
+                else if (DataOperations.GetOP(text) == op.log)
+                {
+                    Console.WriteLine("#{0} {1}: log{2}({3}) = {4}",
+                                      DataOperations.GetIO(text),
+                                      op.pow,
+                                      DataOperations.GetA1(text),
+                                      DataOperations.GetA2(text),
+                                      DataOperations.GetDT(text));
+                }
+
+                //dla ADD
+                else if (DataOperations.GetOP(text) == op.add)
+                {
+                    Console.WriteLine("#{0} {1}: {2} + {3} = {4}",
+                                      DataOperations.GetIO(text),
+                                      op.pow,
+                                      DataOperations.GetA1(text),
+                                      DataOperations.GetA2(text),
+                                      DataOperations.GetDT(text));
+                }
+
+                //dla FAC
+                else if (DataOperations.GetOP(text) == op.fac)
+                {
+                    Console.WriteLine("#{0} {1}: {2}! = {3}",
+                                      DataOperations.GetIO(text),
+                                      op.pow,
+                                      DataOperations.GetA1(text),
+                                      DataOperations.GetDT(text));
+                }
+                //dla hisOP
+                else if (DataOperations.GetOP(text) == op.hisOP)
+                {
+                    Console.WriteLine("HIS OP");
+                    Console.WriteLine("Operation number: {0}", DataOperations.GetA1(text));
+                    Console.WriteLine(DataOperations.GetDT(text));
+                }
+
+                else if(DataOperations.GetOP(text) == op.hisID){
+                    Console.WriteLine("HIS ID");
+                    Console.WriteLine(DataOperations.GetDT(text));
+                }
+
             }
-            else
-            {
-                Console.WriteLine("Result: OP = {0}, A1 = {1}, A2 = {2} equals = {3}",
-                                  DataOperations.GetOP(text),
-                                  DataOperations.GetA1(text),
-                                  DataOperations.GetA2(text),
-                                  "Przekroczono zakres zmiennej");
+            //otrzymano niepoprawne dane
+            else if(DataOperations.GetST(text) == "inc"){
+                Console.WriteLine("Somethinh went wrong... Result Infinity(?)");
+            }
+
+            //tu nic nie powinno wejść
+            else{
+                Console.WriteLine("Ciemna strona mocy. Jak ci się udało tu wejść?");
             }
         }
 
@@ -167,17 +231,18 @@ namespace client_tcp
                     {
                         serverStream.Read(receivedData, 0, receivedData.Length);
                         String text = Encoding.ASCII.GetString(receivedData); //odebrany tekst od klienta
-                        ID = DataOperations.GetID(text); //odświeżam ID
-                        //text = text.Substring(0, text.IndexOf('\0'));
-                        ManageRequestsRecv(text);
-                        //Console.WriteLine("Text from server: {0}", text);
-                        break;
+
+
+                        text = text.Substring(0, text.IndexOf('\0'));
+                        Console.WriteLine("Server: {0}", text);
                     }
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
                 }
+
+                Thread.Sleep(100);
             }
         }
 
