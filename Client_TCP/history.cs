@@ -1,49 +1,61 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace client_tcp
+
+namespace server_tcp
 {
     public class history
     {
-        public string operation;
-        public List<string> hist = new List<string>();
+        public int i = 1;
+        public String operation;
+        public Dictionary<int, String> hist = new Dictionary<int, string>();
 
         public history() { }
 
-        public void Add(string op)
+        public void add(String op)
         {
-            hist.Add(op);
+            hist.Add(i, op);
+            Console.WriteLine("New operation added id: {0} text: {1}", i, op);
+            i++;
         }
-
         public void printID(int id)
         {
-            foreach (string s in hist)
+            foreach (KeyValuePair<int, string> entry in hist)
             {
-                if (DataOperations.GetID(s) == id){
-                    printCalculation(s);
-                }
-
+                if (DataOperations.GetID(entry.Value) == id)
+                    Console.WriteLine(entry.Value);
             }
         }
 
-        public void printCalculation(string s){
-            Console.WriteLine("Operation: {0}, A1= {1}, A2= {2}, Equals = {3}\n",
-                                      DataOperations.GetOP(s),
-                                      DataOperations.GetA1(s),
-                                      DataOperations.GetA2(s),
-                                      DataOperations.GetDT(s)
-                                     );
-        }
-
-        public void printOP(string OP)
+        public void printOP(int key)
         {
-            foreach (string s in hist)
+            foreach (KeyValuePair<int, string> entry in hist)
             {
-                if (DataOperations.GetOP(s) == OP)
+                if (entry.Key == key)
                 {
-                    printCalculation(s);
+                    Console.WriteLine(entry.Value);
+                    Console.WriteLine(entry.Key);
                 }
             }
+        }
+
+        public Dictionary<int, String> getHist()
+        {
+            return hist;
+        }
+
+        public String getHistID(int i)
+        {
+            if (hist.Count != 0)
+            {
+                foreach (KeyValuePair<int, string> entry in hist)
+                {
+                    if (DataOperations.GetA1(entry.Value) == i)
+                        return entry.Value;
+                }
+                return "0";
+            }
+                return "0";
         }
     }
 }
