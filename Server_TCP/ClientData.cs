@@ -31,5 +31,10 @@ namespace server_tcp
             ID = ID_;
             IDset = true;
         }
+
+        public void setConnected(bool b)
+        {
+            connected = b;
+        }
     }
 }

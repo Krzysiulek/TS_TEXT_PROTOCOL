@@ -1,36 +1,65 @@
 ﻿using System;
 using System.Collections.Generic;
 
+
 namespace server_tcp
 {
     public class history
     {
+        public int i = 1;
         public String operation;
-        public List<String> hist = new List<String>();
+        public Dictionary<int, String> hist = new Dictionary<int, string>();
 
         public history() { }
 
         public void add(String op)
         {
-            hist.Add(op);
+            hist.Add(i, op);
+            Console.WriteLine("New operation added id: {0} text: {1}", i, op);
+            i++;
         }
-
         public void printID(int id)
         {
-            foreach (String s in hist)
+            foreach (KeyValuePair<int, string> entry in hist)
             {
-                if (DataOperations.GetID(s) == id)
-                    Console.WriteLine(s);
+                if (DataOperations.GetID(entry.Value) == id)
+                    Console.WriteLine(entry.Value);
             }
         }
 
-        public void printOP(string OP)
+        public void printOP(int key)
         {
-            foreach (String s in hist)
+            foreach (KeyValuePair<int, string> entry in hist)
             {
-                if (DataOperations.GetOP(s) == OP)
-                    Console.WriteLine(s);
+                if (entry.Key == key)
+                {
+                    Console.WriteLine(entry.Value);
+                    Console.WriteLine(entry.Key);
+                }
             }
+        }
+
+        public Dictionary<int, String> getHist()
+        {
+            return hist;
+        }
+
+        public String getHistID(int i)
+        {
+            if (hist.Count != 0)
+            {
+                foreach (KeyValuePair<int, string> entry in hist)
+                {
+                    if (DataOperations.GetA1(entry.Value) == i)
+                        return entry.Value;
+                    else
+                        return "0";
+                }
+            }
+            else
+                return "0";
+
+            return "0";
         }
     }
 }

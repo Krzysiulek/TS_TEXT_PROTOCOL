@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Collections.Generic;
 
 namespace server_tcp
 {
@@ -86,13 +87,24 @@ namespace server_tcp
             {
                 string operation = DataOperations.GetOP(text);
                 int a1, a2;
+                int a1_, a2_;
+                String op_, buff_;
                 a1 = DataOperations.GetA1(text);
                 a2 = DataOperations.GetA2(text);
+                Dictionary<int, String> hist = new Dictionary<int, String>();
                 string to_send, buff;
                 Console.WriteLine("Operation {0}", operation); ;
 
                 switch (operation)
                 {
+                    case "nadid":
+                        Console.WriteLine("Sending ID... ");
+                        int id = ID();
+                        text = DataOperations.SetData(op.SetId, 0, 0, "cor", id, id.ToString());
+                        clientData.setID(id);
+                        History.add(text);
+                        Send(text);
+                        break;
                     case "dodaj":
                         buff = Operations.Add(a1, a2);
                         if (buff == "Infinity")
@@ -149,8 +161,45 @@ namespace server_tcp
                         History.add(to_send);
                         Send(to_send);
                         break;
+                    case "historyid":
+                        hist = History.getHist();
+                        if (hist.Count != 0)
+                        {
+                            foreach (KeyValuePair<int, string> entry in hist)
+                            {
+                                a1_ = DataOperations.GetA1(entry.Value);
+                                a2_ = DataOperations.GetA1(entry.Value);
+                                op_ = DataOperations.GetOP(entry.Value);
+                                buff_ = DataOperations.GetDT(entry.Value);
+                                to_send = DataOperations.SetData(op_, a1_, a2_, "cor", clientData.getIDint(), buff_);
+                                Send(to_send);
+                            }
+                        }
+                        else
+                        {
+                            to_send = DataOperations.SetData("", 0, 0, "inc", clientData.getIDint(), "empty");
+                            Send(to_send);
+                        }
+                        break;
+                    case "historyop":
+                        buff = History.getHistID(a1);
+                        if (buff == "0")
+                        {
+                            to_send = DataOperations.SetData("none", 0, 0, "inc", clientData.getIDint(), "0");
+                            Send(to_send);
+                        }
+                        else
+                        {
+                            a1_ = DataOperations.GetA1(buff);
+                            a2_ = DataOperations.GetA1(buff);
+                            op_ = DataOperations.GetOP(buff);
+                            buff_ = DataOperations.GetDT(buff);
+                            to_send = DataOperations.SetData(op_, a1_, a2_, "cor", clientData.getIDint(), buff_);
+                            Send(to_send);
+                        }
+                        break;
                     case "disconnect":
-                        Close();
+                        clientData.setConnected(false);
                         break;
                     default:
                         Console.WriteLine("Incorrect command");
@@ -164,7 +213,8 @@ namespace server_tcp
 
         public void PrintHistory()
         {
-            string i, oper;
+            string i; 
+            int oper;
             while (true)
             {
                 i = Console.ReadLine();
@@ -177,7 +227,8 @@ namespace server_tcp
                     case "2":
                         Console.WriteLine("History by operation..");
                         Console.WriteLine("which operation do you want?");
-                        oper = Console.ReadLine();
+                        oper = Convert.ToInt32(Console.ReadLine());
+                        Console.WriteLine("pobrano " + oper);
                         History.printOP(oper);
                         break;
                     default:

@@ -6,8 +6,8 @@ class OperStatus
     public String log = "logarytmuj";
     public String fac = "silnia";
     public String SetId = "setId";
-    public String GetHistoryID = "historyID";
-    public String GetHistoryOP = "historyOP";
+    public String GetHistoryID = "historyid";
+    public String GetHistoryOP = "historyop";
     public String Disconnect = "disconnect";
 }
 
