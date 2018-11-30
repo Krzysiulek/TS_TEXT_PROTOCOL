@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace server_tcp
 {
@@ -38,30 +39,27 @@ namespace server_tcp
 
         public void Listen()
         {
-            Console.WriteLine("What do you want to do?");
-            Console.WriteLine();
-            while (true)
+            //Console.WriteLine("What do you want to do?");
+            //Console.WriteLine();
+            try
             {
+                byte[] receivedData = new byte[4096];
 
-                try
+                if (stream.DataAvailable)
                 {
-                    byte[] receivedData = new byte[4096];
-
-                    if (stream.DataAvailable)
-                    {
-                        stream.Read(receivedData, 0, receivedData.Length);
-                        string text = Encoding.ASCII.GetString(receivedData); //odebrany tekst od klienta
-                        text = text.Substring(0, text.IndexOf('\0'));
-                        Console.WriteLine("Text from client: {0}", text);
-                        OperateRequest(text);
-                        break;
-                    }
+                    stream.Read(receivedData, 0, receivedData.Length);
+                    string text = Encoding.ASCII.GetString(receivedData); //odebrany tekst od klienta
+                    text = text.Substring(0, text.IndexOf('\0'));
+                    Console.WriteLine("Text from client: {0}", text);
+                    OperateRequest(text); //przetwarzanie odebranego komunikatu
                 }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.ToString());
-                }
+                Thread.Sleep(100);
             }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+            
         }
 
         private void Send(string text) //wysyłania odpowiedzi do klienta
@@ -74,138 +72,121 @@ namespace server_tcp
 
         private void OperateRequest(string text)
         {
-            if (!clientData.getID())
-            {
-                Console.WriteLine("Sending ID... ");
-                int id = ID();
-                text = DataOperations.SetData(op.SetId, 0, 0, "cor", id, id.ToString());
-                clientData.setID(id);
-                History.add(text);
-                Send(text);
+            //nadanie ID
+            if(DataOperations.GetOP(text) == op.reqID){
+                string ToSend = DataOperations.SetData(op.setID, "cor", GetID());
+                Send(ToSend);
+                //return;
             }
-            else
-            {
-                string operation = DataOperations.GetOP(text);
-                int a1, a2;
-                int a1_, a2_;
-                String op_, buff_;
-                a1 = DataOperations.GetA1(text);
-                a2 = DataOperations.GetA2(text);
-                Dictionary<int, String> hist = new Dictionary<int, String>();
-                string to_send, buff;
-                Console.WriteLine("Operation {0}", operation); ;
+            //POTEGOWANIE
+            else if (DataOperations.GetOP(text) == op.pow){
+                int ActualID = DataOperations.GetID(text);
+                int A1 = DataOperations.GetA1(text);
+                int A2 = DataOperations.GetA2(text);
+                string result = Operations.Pow(A1, A2);
 
-                switch (operation)
-                {
-                    case "nadid":
-                        Console.WriteLine("Sending ID... ");
-                        int id = ID();
-                        text = DataOperations.SetData(op.SetId, 0, 0, "cor", id, id.ToString());
-                        clientData.setID(id);
-                        History.add(text);
-                        Send(text);
-                        break;
-                    case "dodaj":
-                        buff = Operations.Add(a1, a2);
-                        if (buff == "Infinity")
-                        {
-                            Console.WriteLine("To big number!");
-                            to_send = DataOperations.SetData(op.add, a1, a2, "inc", clientData.getIDint(), buff); //incorrect
-                        }
-                        else
-                        {
-                            to_send = DataOperations.SetData(op.add, a1, a2, "cor", clientData.getIDint(), buff);//correct
-                        }
-                        History.add(to_send);
-                        Send(to_send);
-                        break;
-                    case "poteguj":
-                        buff = Operations.Pow(a1, a2);
-                        if (buff == "Infinity")
-                        {
-                            Console.WriteLine("To big number!");
-                            to_send = DataOperations.SetData(op.pow, a1, a2, "inc", clientData.getIDint(), buff);
-                        }
-                        else
-                        {
-                            to_send = DataOperations.SetData(op.pow, a1, a2, "cor", clientData.getIDint(), buff);
-                        }
-                        History.add(to_send);
-                        Send(to_send);
-                        break;
-                    case "logarytmuj":
-                        buff = Operations.Log(a1, a2);
-                        if (buff == "Infinity")
-                        {
-                            Console.WriteLine("To big number!");
-                            to_send = DataOperations.SetData(op.log, a1, a2, "inc", clientData.getIDint(), buff);
-                        }
-                        else
-                        {
-                            to_send = DataOperations.SetData(op.log, a1, a2, "cor", clientData.getIDint(), buff);
-                        }
-                        History.add(to_send);
-                        Send(to_send);
-                        break;
-                    case "silnia":
-                        buff = Operations.Fac(a1, a2);
-                        if (buff == "Infinity")
-                        {
-                            Console.WriteLine("To big number!");
-                            to_send = DataOperations.SetData(op.fac, a1, a2, "inc", clientData.getIDint(), buff);
-                        }
-                        else
-                        {
-                            to_send = DataOperations.SetData(op.fac, a1, a2, "cor", clientData.getIDint(), buff);
-                        }
-                        History.add(to_send);
-                        Send(to_send);
-                        break;
-                    case "historyid":
-                        hist = History.getHist();
-                        if (hist.Count != 0)
-                        {
-                            foreach (KeyValuePair<int, string> entry in hist)
-                            {
-                                a1_ = DataOperations.GetA1(entry.Value);
-                                a2_ = DataOperations.GetA1(entry.Value);
-                                op_ = DataOperations.GetOP(entry.Value);
-                                buff_ = DataOperations.GetDT(entry.Value);
-                                to_send = DataOperations.SetData(op_, a1_, a2_, "cor", clientData.getIDint(), buff_);
-                                Send(to_send);
-                            }
-                        }
-                        else
-                        {
-                            to_send = DataOperations.SetData("", 0, 0, "inc", clientData.getIDint(), "empty");
-                            Send(to_send);
-                        }
-                        break;
-                    case "historyop":
-                        buff = History.getHistID(a1);
-                        if (buff == "0")
-                        {
-                            to_send = DataOperations.SetData("none", 0, 0, "inc", clientData.getIDint(), "0");
-                            Send(to_send);
-                        }
-                        else
-                        {
-                            a1_ = DataOperations.GetA1(buff);
-                            a2_ = DataOperations.GetA1(buff);
-                            op_ = DataOperations.GetOP(buff);
-                            buff_ = DataOperations.GetDT(buff);
-                            to_send = DataOperations.SetData(op_, a1_, a2_, "cor", clientData.getIDint(), buff_);
-                            Send(to_send);
-                        }
-                        break;
-                    case "disconnect":
-                        clientData.setConnected(false);
-                        break;
-                    default:
-                        Console.WriteLine("Incorrect command");
-                        Send("Incorrect command");
-                        break;
+                if(result == "Infinity"){
+                    string ToSend = DataOperations.SetData(op.pow, "inc", ActualID, A1, A2, History.GetI(), result);
+                    History.add(ToSend);
+                    Send(ToSend);
                 }
+                else{
+                    string ToSend = DataOperations.SetData(op.pow, "cor", ActualID, A1, A2, History.GetI(), result);
+                    History.add(ToSend);
+                    Send(ToSend);
+                }
+            }
+
+            //LOGARYTM
+            else if (DataOperations.GetOP(text) == op.log)
+            {
+                int ActualID = DataOperations.GetID(text);
+                int A1 = DataOperations.GetA1(text);
+                int A2 = DataOperations.GetA2(text);
+                string result = Operations.Log(A1, A2);
+
+                if (result == "Infinity")
+                {
+                    string ToSend = DataOperations.SetData(op.log, "inc", ActualID, A1, A2, History.GetI(), result);
+                    History.add(ToSend);
+                    Send(ToSend);
+                }
+                else
+                {
+                    string ToSend = DataOperations.SetData(op.log, "cor", ActualID, A1, A2, History.GetI(), result);
+                    History.add(ToSend);
+                    Send(ToSend);
+                }
+            }
+
+            //DODAWANIE
+            else if (DataOperations.GetOP(text) == op.add)
+            {
+                int ActualID = DataOperations.GetID(text);
+                int A1 = DataOperations.GetA1(text);
+                int A2 = DataOperations.GetA2(text);
+                string result = Operations.Add(A1, A2);
+
+                if (result == "Infinity")
+                {
+                    string ToSend = DataOperations.SetData(op.add, "inc", ActualID, A1, A2, History.GetI(), result);
+                    History.add(ToSend);
+                    Send(ToSend);
+                }
+                else
+                {
+                    string ToSend = DataOperations.SetData(op.add, "cor", ActualID, A1, A2, History.GetI(), result);
+                    History.add(ToSend);
+                    Send(ToSend);
+                }
+            }
+
+            //SILNIA
+            else if (DataOperations.GetOP(text) == op.fac)
+            {
+                int ActualID = DataOperations.GetID(text);
+                int A1 = DataOperations.GetA1(text);
+                string result = Operations.Fac(A1);
+
+                if (result == "Infinity")
+                {
+                    string ToSend = DataOperations.SetData(op.fac, "inc", ActualID, A1, 0, History.GetI(), result);
+                    History.add(ToSend);
+                    Send(ToSend);
+                }
+                else
+                {
+                    string ToSend = DataOperations.SetData(op.fac, "cor", ActualID, A1, 0, History.GetI(), result);
+                    History.add(ToSend);
+                    Send(ToSend);
+                }
+            }
+
+            //historiaID
+            else if(DataOperations.GetOP(text) == op.hisID){
+                foreach(KeyValuePair<int, string> kvp in History.hist){
+                    //Console.WriteLine("K: {0}, V: {1}", kvp.Key, kvp.Value);
+                    string ToSend = DataOperations.SetData(op.hisID, "cor", DataOperations.GetID(text), kvp.Value);
+                    Send(ToSend);
+                    Console.WriteLine("To send ForEach: " + ToSend);
+                    Thread.Sleep(1000);
+                }
+            }
+
+            //historiaOP
+            else if(DataOperations.GetOP(text) == op.hisOP){
+                foreach (KeyValuePair<int, string> kvp in History.hist){
+                    if(kvp.Key == DataOperations.GetA1(text)){
+                        string ToSend = DataOperations.SetData(op.hisOP, "cor", DataOperations.GetID(text), kvp.Value);
+                        Send(ToSend);
+                        Console.WriteLine("Sending OP history");
+                    }
+                }
+            }
+
+            else if(DataOperations.GetOP(text) == op.discon){
+                Console.WriteLine("Client disconnected. Deleting history");
+                History.DeleteHistory();
             }
 
         }
@@ -248,11 +229,10 @@ namespace server_tcp
             client.Close();
         }
 
-        private int ID()
+        private int GetID()
         {
             Random rand = new Random();
             return rand.Next(255);
-
         }
     }
 }

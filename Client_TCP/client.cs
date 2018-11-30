@@ -33,7 +33,7 @@ namespace client_tcp
             //jezeli klient nie ma nadanego ID
             if (ID == 0)
             {
-                string tmp = DataOperations.SetData("reqID", "cor", 0); //komunikat - rządanie o ID
+                string tmp = DataOperations.SetData("reqID", "cor", 0); //komunikat - żądanie o ID
                 buffer = Encoding.ASCII.GetBytes(tmp); //przekształcenie komunikatu w byte[] 
                 serverStream.Write(buffer, 0, buffer.Length); //wysłanie
                 return;
@@ -46,6 +46,9 @@ namespace client_tcp
             if(text != null){
                 byte[] outStream = Encoding.ASCII.GetBytes(text);
                 serverStream.Write(outStream, 0, outStream.Length);
+            }
+            else{
+                return;
             }
 
             //tutaj zamykam
@@ -116,7 +119,7 @@ namespace client_tcp
             }
             else if(text == op.hisOP){
                 Console.WriteLine("Which operation are you interested in?");
-                return DataOperations.SetData(op.hisID, "cor", ID, GetA1());
+                return DataOperations.SetData(op.hisOP, "cor", ID, GetA1());
             }
             else if(text == op.discon){
                 Console.WriteLine("Disconnecting...");
@@ -143,12 +146,14 @@ namespace client_tcp
             }
         }
 
-        private void ReceiveManage(string text){
+        private void ReceiveManage(string text)
+        {
             //otrzymano poprawne dane
             if(DataOperations.GetST(text) == "cor"){
                 //pobieranie ID
                 if(DataOperations.GetOP(text) == op.setID){
                     ID = DataOperations.GetID(text);
+                    Console.WriteLine(ID);
                 }
                 //dla POW
                 else if(DataOperations.GetOP(text) == op.pow)
@@ -166,7 +171,7 @@ namespace client_tcp
                 {
                     Console.WriteLine("#{0} {1}: log{2}({3}) = {4}",
                                       DataOperations.GetIO(text),
-                                      op.pow,
+                                      op.log,
                                       DataOperations.GetA1(text),
                                       DataOperations.GetA2(text),
                                       DataOperations.GetDT(text));
@@ -177,7 +182,7 @@ namespace client_tcp
                 {
                     Console.WriteLine("#{0} {1}: {2} + {3} = {4}",
                                       DataOperations.GetIO(text),
-                                      op.pow,
+                                      op.add,
                                       DataOperations.GetA1(text),
                                       DataOperations.GetA2(text),
                                       DataOperations.GetDT(text));
@@ -188,32 +193,39 @@ namespace client_tcp
                 {
                     Console.WriteLine("#{0} {1}: {2}! = {3}",
                                       DataOperations.GetIO(text),
-                                      op.pow,
+                                      op.fac,
                                       DataOperations.GetA1(text),
                                       DataOperations.GetDT(text));
                 }
                 //dla hisOP
                 else if (DataOperations.GetOP(text) == op.hisOP)
                 {
-                    Console.WriteLine("HIS OP");
-                    Console.WriteLine("Operation number: {0}", DataOperations.GetA1(text));
-                    Console.WriteLine(DataOperations.GetDT(text));
+                    Console.WriteLine("HIS ID");
+                    string text2 = DataOperations.GetDT(text);
+                    Console.WriteLine("#{0} OP:{1} A1={2} A2={3} Equals={4}",
+                                      DataOperations.GetIO(text2),
+                                      DataOperations.GetOP(text2),
+                                      DataOperations.GetA1(text2),
+                                      DataOperations.GetA2(text2),
+                                      DataOperations.GetDT(text2));
                 }
 
+                //historiaID
                 else if(DataOperations.GetOP(text) == op.hisID){
                     Console.WriteLine("HIS ID");
-                    Console.WriteLine(DataOperations.GetDT(text));
+                    string text2 = DataOperations.GetDT(text);
+                    Console.WriteLine("#{0} OP: {1}, A1:{2} A2:{3} Equals = {4}\n\n",
+                                      DataOperations.GetIO(text2),
+                                      DataOperations.GetOP(text2),
+                                      DataOperations.GetA1(text2),
+                                      DataOperations.GetA2(text2),
+                                      DataOperations.GetDT(text2));
                 }
 
             }
             //otrzymano niepoprawne dane
             else if(DataOperations.GetST(text) == "inc"){
                 Console.WriteLine("Somethinh went wrong... Result Infinity(?)");
-            }
-
-            //tu nic nie powinno wejść
-            else{
-                Console.WriteLine("Ciemna strona mocy. Jak ci się udało tu wejść?");
             }
         }
 
@@ -222,27 +234,18 @@ namespace client_tcp
         {
             while (true)
             {
-                try
+
+                serverStream = client.GetStream();
+                byte[] receivedData = new byte[4096];
+                if (serverStream.DataAvailable)
                 {
-                    serverStream = client.GetStream();
-                    byte[] receivedData = new byte[4096];
-
-                    if (serverStream.DataAvailable)
-                    {
-                        serverStream.Read(receivedData, 0, receivedData.Length);
-                        String text = Encoding.ASCII.GetString(receivedData); //odebrany tekst od klienta
-
-
-                        text = text.Substring(0, text.IndexOf('\0'));
-                        Console.WriteLine("Server: {0}", text);
-                    }
+                    serverStream.Read(receivedData, 0, receivedData.Length);
+                    String text = Encoding.ASCII.GetString(receivedData); //odebrany tekst od serwera
+                    text = text.Substring(0, text.IndexOf('\0'));
+                    //Console.WriteLine("Server: {0}", text);
+                    ReceiveManage(text);
                 }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-
-                Thread.Sleep(100);
+                Thread.Sleep(1000);
             }
         }
 

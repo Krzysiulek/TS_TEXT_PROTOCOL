@@ -8,7 +8,7 @@ namespace server_tcp
     {
         public int i = 1;
         public String operation;
-        public Dictionary<int, String> hist = new Dictionary<int, string>();
+        public Dictionary<int, string> hist = new Dictionary<int, string>();
 
         public history() { }
 
@@ -27,6 +27,11 @@ namespace server_tcp
             }
         }
 
+        public int GetI(){
+            return i;
+        }
+
+
         public void printOP(int key)
         {
             foreach (KeyValuePair<int, string> entry in hist)
@@ -42,6 +47,10 @@ namespace server_tcp
         public Dictionary<int, String> getHist()
         {
             return hist;
+        }
+
+        public void DeleteHistory(){
+            hist.Clear();
         }
 
         public String getHistID(int i)

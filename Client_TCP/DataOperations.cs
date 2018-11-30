@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Text;
 using System.Text.RegularExpressions;
-
-namespace client_tcp
-{
-
     /*
     * 
     * 
@@ -312,5 +308,3 @@ namespace client_tcp
         }
 
     }
-
-}

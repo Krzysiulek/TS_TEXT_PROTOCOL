@@ -35,16 +35,16 @@ namespace client_tcp
 
 
             Client client = new Client(IP, port);
-            Thread thread = new Thread(client.Receive);
-            thread.Start();
+            Thread receive = new Thread(client.Receive);
+            receive.Start();
             client.Send();
+            Thread.Sleep(2000);
 
             while(true)
             {
                 Thread.Sleep(100);
-                client.Send();
-                    
                 //client.Receive();
+                client.Send();
             }
         }
     }

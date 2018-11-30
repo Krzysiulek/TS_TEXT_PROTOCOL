@@ -1,14 +1,16 @@
 ﻿using System;
 class OperStatus
 {
-    public String add = "dodaj";
-    public String pow = "poteguj";
-    public String log = "logarytmuj";
-    public String fac = "silnia";
-    public String SetId = "setId";
-    public String GetHistoryID = "historyid";
-    public String GetHistoryOP = "historyop";
-    public String Disconnect = "disconnect";
+    public string reqID = "reqID";
+    public string setID = "setID";
+    public string pow = "potega";
+    public string log = "logarytm";
+    public string add = "dodawanie";
+    public string fac = "silnia";
+    public string hisID = "historiaID";
+    public string hisOP = "historiaOP";
+    public string discon = "disconnect";
+
 }
 
 namespace server_tcp
@@ -30,9 +32,9 @@ namespace server_tcp
             return x.ToString();
         }
 
-        public static string Fac(int a1, int a2)
+        public static string Fac(int a1)
         {
-            return Factor(a1 + a2).ToString();
+            return Factor(a1).ToString();
         }
 
         public static string Add(int a1, int a2)
