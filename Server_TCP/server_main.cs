@@ -10,17 +10,13 @@ namespace server_tcp
         //private static readonly string IP = "192.168.43.32";
         public static void Main(string[] args)
         {
-            string tmp = Operations.Pow(999999999, 999999999);
-            Console.WriteLine(tmp);
-
-
             Server server = new Server(IP, port);
             Thread t1 = new Thread(server.PrintHistory);
             t1.Start();
 
-            while(true)
+            while (true)
             {
-                    server.Listen();
+                server.Listen();
             }
         }
     }

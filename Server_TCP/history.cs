@@ -23,11 +23,12 @@ namespace server_tcp
             foreach (KeyValuePair<int, string> entry in hist)
             {
                 if (DataOperations.GetID(entry.Value) == id)
-                    Console.WriteLine(entry.Value);
+                    Console.WriteLine("#" + entry.Key + " " + entry.Value);
             }
         }
 
-        public int GetI(){
+        public int GetI()
+        {
             return i;
         }
 
@@ -49,7 +50,8 @@ namespace server_tcp
             return hist;
         }
 
-        public void DeleteHistory(){
+        public void DeleteHistory()
+        {
             hist.Clear();
         }
 
@@ -59,10 +61,7 @@ namespace server_tcp
             {
                 foreach (KeyValuePair<int, string> entry in hist)
                 {
-                    if (DataOperations.GetA1(entry.Value) == i)
-                        return entry.Value;
-                    else
-                        return "0";
+                    return DataOperations.GetA1(entry.Value) == i ? entry.Value : "0";
                 }
             }
             else
@@ -72,5 +71,4 @@ namespace server_tcp
         }
     }
 }
-// history dodawania = new history(dodaj)
-// dodawania.add
+

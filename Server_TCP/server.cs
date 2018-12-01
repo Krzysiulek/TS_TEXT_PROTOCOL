@@ -59,7 +59,7 @@ namespace server_tcp
             {
                 Console.WriteLine(e.ToString());
             }
-            
+
         }
 
         private void Send(string text) //wysyłania odpowiedzi do klienta
@@ -73,24 +73,29 @@ namespace server_tcp
         private void OperateRequest(string text)
         {
             //nadanie ID
-            if(DataOperations.GetOP(text) == op.reqID){
-                string ToSend = DataOperations.SetData(op.setID, "cor", GetID());
+            if (DataOperations.GetOP(text) == op.reqID)
+            {
+                clientData.setID(SetID());
+                string ToSend = DataOperations.SetData(op.setID, "cor", clientData.getIDint());
                 Send(ToSend);
                 //return;
             }
             //POTEGOWANIE
-            else if (DataOperations.GetOP(text) == op.pow){
+            else if (DataOperations.GetOP(text) == op.pow)
+            {
                 int ActualID = DataOperations.GetID(text);
                 int A1 = DataOperations.GetA1(text);
                 int A2 = DataOperations.GetA2(text);
                 string result = Operations.Pow(A1, A2);
 
-                if(result == "Infinity"){
+                if (result == "Infinity")
+                {
                     string ToSend = DataOperations.SetData(op.pow, "inc", ActualID, A1, A2, History.GetI(), result);
                     History.add(ToSend);
                     Send(ToSend);
                 }
-                else{
+                else
+                {
                     string ToSend = DataOperations.SetData(op.pow, "cor", ActualID, A1, A2, History.GetI(), result);
                     History.add(ToSend);
                     Send(ToSend);
@@ -163,20 +168,25 @@ namespace server_tcp
             }
 
             //historiaID
-            else if(DataOperations.GetOP(text) == op.hisID){
-                foreach(KeyValuePair<int, string> kvp in History.hist){
+            else if (DataOperations.GetOP(text) == op.hisID)
+            {
+                foreach (KeyValuePair<int, string> kvp in History.hist)
+                {
                     //Console.WriteLine("K: {0}, V: {1}", kvp.Key, kvp.Value);
                     string ToSend = DataOperations.SetData(op.hisID, "cor", DataOperations.GetID(text), kvp.Value);
                     Send(ToSend);
                     Console.WriteLine("To send ForEach: " + ToSend);
-                    Thread.Sleep(1000);
+                    Thread.Sleep(500);
                 }
             }
 
             //historiaOP
-            else if(DataOperations.GetOP(text) == op.hisOP){
-                foreach (KeyValuePair<int, string> kvp in History.hist){
-                    if(kvp.Key == DataOperations.GetA1(text)){
+            else if (DataOperations.GetOP(text) == op.hisOP)
+            {
+                foreach (KeyValuePair<int, string> kvp in History.hist)
+                {
+                    if (kvp.Key == DataOperations.GetA1(text))
+                    {
                         string ToSend = DataOperations.SetData(op.hisOP, "cor", DataOperations.GetID(text), kvp.Value);
                         Send(ToSend);
                         Console.WriteLine("Sending OP history");
@@ -184,7 +194,8 @@ namespace server_tcp
                 }
             }
 
-            else if(DataOperations.GetOP(text) == op.discon){
+            else if (DataOperations.GetOP(text) == op.discon)
+            {
                 Console.WriteLine("Client disconnected. Deleting history");
                 History.DeleteHistory();
             }
@@ -194,7 +205,7 @@ namespace server_tcp
 
         public void PrintHistory()
         {
-            string i; 
+            string i;
             int oper;
             while (true)
             {
@@ -229,7 +240,7 @@ namespace server_tcp
             client.Close();
         }
 
-        private int GetID()
+        private int SetID()
         {
             Random rand = new Random();
             return rand.Next(255);
